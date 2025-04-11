@@ -18,10 +18,7 @@ This workshop is designed to help you learn how to guide GitHub Copilot with cle
 
 1. **🧮 Sorting Tables** – Enable sorting on the list of veterinarians by last name.  
 2. **🩺 Editable Veterinarians** – Create and edit veterinarians using forms and CRUD operations.  
-3. **🧪 Refactoring & Tests** – Refactor existing code and write comprehensive tests.  
-4. **🌳 Relationship Visualization** – Generate an ASCII tree representing relationships among veterinarians, their specialties, pets, and owners.
-
-Each chapter builds on the previous one, introducing new ways to leverage Copilot’s capabilities.
+3. **🌳 Relationship Visualization** – Generate an ASCII tree representing relationships among veterinarians, their specialties, pets, and owners.
 
 ---
 
@@ -29,7 +26,7 @@ Each chapter builds on the previous one, introducing new ways to leverage Copilo
 
 **Goal:** Add sorting to the list of veterinarians by their last name.
 
-### Files to Modify
+### Files to Modify (probably)
 - `src/main/java/org/springframework/samples/petclinic/vet/VetController.java`  
   Modify the controller method that retrieves the list of vets to support sorting.
 - `src/main/resources/templates/vets/vetList.html`  
@@ -53,6 +50,10 @@ Each chapter builds on the previous one, introducing new ways to leverage Copilo
 - Ensure the sorting parameter is correctly passed from the UI to the controller.
 - Verify that the repository method returns data sorted by last name.
 - Use existing pagination tests (if any) as a reference to see how sorting might be tested similarly.
+
+__Additional Goal:__
+- Can you make the sorting based on the first name as well?
+- Can you make the sorting based on any table header and ascending/descending?
 
 ---
 
@@ -91,39 +92,12 @@ Each chapter builds on the previous one, introducing new ways to leverage Copilo
   3. Editing existing vets (including loading the form with existing data).
   4. Repository calls (mocking or verifying interactions).
 
----
-
-## 🧹 Chapter 3: Refactor + Test Generation
-
-**Goal:** Clean up existing methods in `VetController` and `VetRepository`, then write comprehensive tests.
-
-### Files to Modify
-- `src/main/java/org/springframework/samples/petclinic/vet/VetController.java`
-  - Simplify or shorten methods, extract repeated logic, and improve readability.
-- `src/main/java/org/springframework/samples/petclinic/vet/VetRepository.java`
-  - If you have outdated or unused methods, remove or refactor them.
-- `src/test/java/org/springframework/samples/petclinic/vet/VetControllerTests.java`
-  - Add or improve tests for the refactored methods (consider mocking to isolate units under test).
-- **Create/Update**: `src/test/java/org/springframework/samples/petclinic/vet/VetValidatorTests.java`
-  - Write unit tests for your `VetValidator` logic.
-
-### Suggested Copilot Prompts
-
-```java
-// Refactor VetController methods to reduce duplication
-// Extract specialty validation into a dedicated helper method
-// Write tests for VetValidator to ensure it rejects invalid data
-```
-
-### Testing Hints
-1. **Mocking:** Use frameworks like Mockito or similar to isolate the code being tested.  
-2. **Nested Tests:** `@Nested` classes help group test methods (e.g., creation vs. update tests).  
-3. **Edge Cases:** Check boundary conditions (e.g., blank last names, too many specialties, etc.).  
-4. **Coverage:** Aim for high code coverage to ensure your refactoring didn’t break anything.
+__Additional Goal:__
+- What other forms could you build to make more data editable?
 
 ---
 
-## 🌳 Chapter 4: Relationship Visualization
+## 🌳 Chapter 3: Relationship Visualization
 
 **Goal:** Create a feature that displays an ASCII tree of relationships among veterinarians, their specialties, pets, and owners.
 
@@ -166,6 +140,10 @@ Each chapter builds on the previous one, introducing new ways to leverage Copilo
 - Test that each specialty is linked to the correct vet.
 - Test that pets (with owners) appear under the correct vet node.
 - Consider edge cases (e.g., a vet with no specialties, a pet with no owner in the data set).
+
+
+__Additional Goal:__
+- Can you add links to the ASCII tree that allow you to click on a vet or pet to view their details?
 
 ---
 
