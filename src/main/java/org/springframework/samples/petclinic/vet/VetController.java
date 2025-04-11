@@ -20,6 +20,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,27 +43,34 @@ class VetController {
 	}
 
 	@GetMapping("/vets.html")
-	public String showVetList(@RequestParam(defaultValue = "1") int page, Model model) {
+	public String showVetList(@RequestParam(defaultValue = "1") int page,
+			@RequestParam(defaultValue = "lastName") String sort, @RequestParam(defaultValue = "asc") String direction,
+			Model model) {
 		// Here we are returning an object of type 'Vets' rather than a collection of Vet
 		// objects so it is simpler for Object-Xml mapping
 		Vets vets = new Vets();
-		Page<Vet> paginated = findPaginated(page);
+		Page<Vet> paginated = findPaginated(page, sort, direction);
 		vets.getVetList().addAll(paginated.toList());
-		return addPaginationModel(page, paginated, model);
+		return addPaginationModel(page, paginated, model, sort, direction);
 	}
 
-	private String addPaginationModel(int page, Page<Vet> paginated, Model model) {
+	private String addPaginationModel(int page, Page<Vet> paginated, Model model, String sort, String direction) {
 		List<Vet> listVets = paginated.getContent();
 		model.addAttribute("currentPage", page);
 		model.addAttribute("totalPages", paginated.getTotalPages());
 		model.addAttribute("totalItems", paginated.getTotalElements());
 		model.addAttribute("listVets", listVets);
+		model.addAttribute("sortField", sort);
+		model.addAttribute("sortDirection", direction);
+		model.addAttribute("reverseSortDirection", direction.equals("asc") ? "desc" : "asc");
 		return "vets/vetList";
 	}
 
-	private Page<Vet> findPaginated(int page) {
+	private Page<Vet> findPaginated(int page, String sortField, String sortDirection) {
 		int pageSize = 5;
-		Pageable pageable = PageRequest.of(page - 1, pageSize);
+		Sort sort = sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortField).ascending()
+				: Sort.by(sortField).descending();
+		Pageable pageable = PageRequest.of(page - 1, pageSize, sort);
 		return vetRepository.findAll(pageable);
 	}
 

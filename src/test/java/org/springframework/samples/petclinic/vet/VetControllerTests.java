@@ -81,12 +81,27 @@ class VetControllerTests {
 
 	@Test
 	void testShowVetListHtml() throws Exception {
-
 		mockMvc.perform(MockMvcRequestBuilders.get("/vets.html?page=1"))
 			.andExpect(status().isOk())
 			.andExpect(model().attributeExists("listVets"))
+			.andExpect(model().attributeExists("sortField"))
+			.andExpect(model().attributeExists("sortDirection"))
+			.andExpect(model().attribute("sortField", "lastName"))
+			.andExpect(model().attribute("sortDirection", "asc"))
 			.andExpect(view().name("vets/vetList"));
+	}
 
+	@Test
+	void testShowVetListHtmlWithSort() throws Exception {
+		mockMvc.perform(MockMvcRequestBuilders.get("/vets.html?page=1&sort=firstName&direction=desc"))
+			.andExpect(status().isOk())
+			.andExpect(model().attributeExists("listVets"))
+			.andExpect(model().attributeExists("sortField"))
+			.andExpect(model().attributeExists("sortDirection"))
+			.andExpect(model().attribute("sortField", "firstName"))
+			.andExpect(model().attribute("sortDirection", "desc"))
+			.andExpect(model().attribute("reverseSortDirection", "asc"))
+			.andExpect(view().name("vets/vetList"));
 	}
 
 	@Test
