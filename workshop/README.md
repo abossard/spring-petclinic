@@ -12,6 +12,11 @@ This workshop is designed to help you learn how to guide GitHub Copilot with cle
 3. **Show It the Files:** When you want Copilot to reference existing code (e.g., entities, controller classes, or tests), open those files so Copilot can see them and provide more context-aware suggestions.
 4. **Iterate on Prompts:** If you don’t like what Copilot suggests, refine your prompt. The more detail you provide, the better Copilot’s output can be.
 
+## How to run the project:
+
+```bash
+./mvnw spring-javaformat:apply spring-boot:run
+```
 ---
 
 ## 🧭 Chapters Overview
