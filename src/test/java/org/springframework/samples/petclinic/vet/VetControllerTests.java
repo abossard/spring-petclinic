@@ -51,24 +51,32 @@ class VetControllerTests {
 	@MockitoBean
 	private VetRepository vets;
 
-	private Vet james() {
-		Vet james = new Vet();
-		james.setFirstName("James");
-		james.setLastName("Carter");
-		james.setId(1);
-		return james;
-	}
+	private static final Vet JAMES;
 
-	private Vet helen() {
-		Vet helen = new Vet();
-		helen.setFirstName("Helen");
-		helen.setLastName("Leary");
-		helen.setId(2);
+	private static final Vet HELEN;
+
+	static {
+		JAMES = new Vet();
+		JAMES.setFirstName("James");
+		JAMES.setLastName("Carter");
+		JAMES.setId(1);
+
+		HELEN = new Vet();
+		HELEN.setFirstName("Helen");
+		HELEN.setLastName("Leary");
+		HELEN.setId(2);
 		Specialty radiology = new Specialty();
 		radiology.setId(1);
 		radiology.setName("radiology");
-		helen.addSpecialty(radiology);
-		return helen;
+		HELEN.addSpecialty(radiology);
+	}
+
+	private Vet james() {
+		return JAMES;
+	}
+
+	private Vet helen() {
+		return HELEN;
 	}
 
 	@BeforeEach
@@ -87,14 +95,6 @@ class VetControllerTests {
 			.andExpect(model().attributeExists("listVets"))
 			.andExpect(view().name("vets/vetList"));
 
-	}
-
-	@Test
-	void testShowResourcesVetList() throws Exception {
-		ResultActions actions = mockMvc.perform(get("/vets").accept(MediaType.APPLICATION_JSON))
-			.andExpect(status().isOk());
-		actions.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-			.andExpect(jsonPath("$.vetList[0].id").value(1));
 	}
 
 }

@@ -10,16 +10,25 @@
 <table id="vets" class="table table-striped">
   <thead>
   <tr>
-    <th>Name</th>
+    <th>
+      <a th:href="@{'/vets.html?sort=firstName&order=asc'}">First Name ↑</a> |
+      <a th:href="@{'/vets.html?sort=firstName&order=desc'}">First Name ↓</a>
+    </th>
+    <th>
+      <a th:href="@{'/vets.html?sort=lastName&order=asc'}">Last Name ↑</a> |
+      <a th:href="@{'/vets.html?sort=lastName&order=desc'}">Last Name ↓</a>
+    </th>
     <th>Specialties</th>
   </tr>
   </thead>
   <tbody>
   <tr th:each="vet : ${listVets}">
-    <td th:text="${vet.firstName + ' ' + vet.lastName}"></td>
-    <td><span th:each="specialty : ${vet.specialties}"
-              th:text="${specialty.name + ' '}"/> <span
-      th:if="${vet.nrOfSpecialties == 0}">none</span></td>
+    <td th:text="${vet.firstName}"></td>
+    <td th:text="${vet.lastName}"></td>
+    <td>
+      <span th:each="specialty : ${vet.specialties}" th:text="${specialty.name + ' '}"></span>
+      <span th:if="${vet.nrOfSpecialties == 0}">none</span>
+    </td>
   </tr>
   </tbody>
 </table>
