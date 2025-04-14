@@ -76,6 +76,7 @@ class OwnerControllerTests {
 		george.setAddress("110 W. Liberty St.");
 		george.setCity("Madison");
 		george.setTelephone("6085551023");
+		george.setInstagram("@george_franklin");
 		Pet max = new Pet();
 		PetType dog = new PetType();
 		dog.setName("dog");
@@ -118,7 +119,8 @@ class OwnerControllerTests {
 				.param("lastName", "Bloggs")
 				.param("address", "123 Caramel Street")
 				.param("city", "London")
-				.param("telephone", "1316761638"))
+				.param("telephone", "1316761638")
+				.param("instagram", "@joe_bloggs"))
 			.andExpect(status().is3xxRedirection());
 	}
 
@@ -179,6 +181,7 @@ class OwnerControllerTests {
 			.andExpect(model().attribute("owner", hasProperty("address", is("110 W. Liberty St."))))
 			.andExpect(model().attribute("owner", hasProperty("city", is("Madison"))))
 			.andExpect(model().attribute("owner", hasProperty("telephone", is("6085551023"))))
+			.andExpect(model().attribute("owner", hasProperty("instagram", is("@george_franklin"))))
 			.andExpect(view().name("owners/createOrUpdateOwnerForm"));
 	}
 
@@ -189,7 +192,8 @@ class OwnerControllerTests {
 				.param("lastName", "Bloggs")
 				.param("address", "123 Caramel Street")
 				.param("city", "London")
-				.param("telephone", "1616291589"))
+				.param("telephone", "1616291589")
+				.param("instagram", "@joe_updated"))
 			.andExpect(status().is3xxRedirection())
 			.andExpect(view().name("redirect:/owners/{ownerId}"));
 	}
@@ -224,6 +228,7 @@ class OwnerControllerTests {
 			.andExpect(model().attribute("owner", hasProperty("address", is("110 W. Liberty St."))))
 			.andExpect(model().attribute("owner", hasProperty("city", is("Madison"))))
 			.andExpect(model().attribute("owner", hasProperty("telephone", is("6085551023"))))
+			.andExpect(model().attribute("owner", hasProperty("instagram", is("@george_franklin"))))
 			.andExpect(model().attribute("owner", hasProperty("pets", not(empty()))))
 			.andExpect(model().attribute("owner",
 					hasProperty("pets", hasItem(hasProperty("visits", hasSize(greaterThan(0)))))))
@@ -241,6 +246,7 @@ class OwnerControllerTests {
 		owner.setAddress("Center Street");
 		owner.setCity("New York");
 		owner.setTelephone("0123456789");
+		owner.setInstagram("@john_doe");
 
 		when(owners.findById(pathOwnerId)).thenReturn(Optional.of(owner));
 

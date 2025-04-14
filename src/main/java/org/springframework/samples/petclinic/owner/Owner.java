@@ -60,6 +60,9 @@ public class Owner extends Person {
 	@Pattern(regexp = "\\d{10}", message = "Telephone must be a 10-digit number")
 	private String telephone;
 
+	@Column(name = "instagram")
+	private String instagram;
+
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "owner_id")
 	@OrderBy("name")
@@ -87,6 +90,14 @@ public class Owner extends Person {
 
 	public void setTelephone(String telephone) {
 		this.telephone = telephone;
+	}
+
+	public String getInstagram() {
+		return this.instagram;
+	}
+
+	public void setInstagram(String instagram) {
+		this.instagram = instagram;
 	}
 
 	public List<Pet> getPets() {
@@ -152,6 +163,7 @@ public class Owner extends Person {
 			.append("address", this.address)
 			.append("city", this.city)
 			.append("telephone", this.telephone)
+			.append("instagram", this.instagram)
 			.toString();
 	}
 
