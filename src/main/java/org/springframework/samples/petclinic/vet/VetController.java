@@ -23,9 +23,19 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.cache.annotation.CacheEvict;
+
+import jakarta.validation.Valid;
 
 /**
  * @author Juergen Hoeller
@@ -37,6 +47,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 class VetController {
 
 	private final VetRepository vetRepository;
+
+	private static final String VIEWS_VET_CREATE_OR_UPDATE_FORM = "vets/createOrUpdateVetForm";
 
 	public VetController(VetRepository vetRepository) {
 		this.vetRepository = vetRepository;
@@ -65,6 +77,71 @@ class VetController {
 		Pageable pageable = PageRequest.of(page - 1, pageSize,
 				order.equalsIgnoreCase("asc") ? Sort.by(sort).ascending() : Sort.by(sort).descending());
 		return vetRepository.findAll(pageable);
+	}
+
+	@InitBinder
+	public void setAllowedFields(WebDataBinder dataBinder) {
+		dataBinder.setDisallowedFields("id");
+	}
+
+	@ModelAttribute("vet")
+	public Vet findVet(@PathVariable(name = "vetId", required = false) Integer vetId) {
+		return vetId == null ? new Vet() : this.vetRepository.findById(vetId)
+			.orElseThrow(() -> new IllegalArgumentException("Vet not found with id: " + vetId));
+	}
+
+	@GetMapping("/vets/new")
+	public String initCreationForm(Model model) {
+		model.addAttribute("vet", new Vet());
+		return VIEWS_VET_CREATE_OR_UPDATE_FORM;
+	}
+
+	@PostMapping("/vets/new")
+	@CacheEvict(value = "vets", allEntries = true)
+	public String processCreationForm(@Valid Vet vet, BindingResult result, RedirectAttributes redirectAttributes) {
+		if (result.hasErrors()) {
+			return VIEWS_VET_CREATE_OR_UPDATE_FORM;
+		}
+
+		this.vetRepository.save(vet);
+		redirectAttributes.addFlashAttribute("message", "New Vet Created");
+		return "redirect:/vets/" + vet.getId();
+	}
+
+	@GetMapping("/vets/{vetId}/edit")
+	public String initUpdateVetForm(@PathVariable("vetId") int vetId, Model model) {
+		Vet vet = this.vetRepository.findById(vetId)
+			.orElseThrow(() -> new IllegalArgumentException("Vet not found with id: " + vetId));
+		model.addAttribute("vet", vet);
+		return VIEWS_VET_CREATE_OR_UPDATE_FORM;
+	}
+
+	@PostMapping("/vets/{vetId}/edit")
+	@CacheEvict(value = "vets", allEntries = true)
+	public String processUpdateVetForm(@Valid Vet vet, BindingResult result, @PathVariable("vetId") int vetId,
+			RedirectAttributes redirectAttributes) {
+		if (result.hasErrors()) {
+			return VIEWS_VET_CREATE_OR_UPDATE_FORM;
+		}
+
+		if (vet.getId() != vetId) {
+			result.rejectValue("id", "mismatch", "The vet ID in the form does not match the URL.");
+			redirectAttributes.addFlashAttribute("error", "Vet ID mismatch. Please try again.");
+			return "redirect:/vets/{vetId}/edit";
+		}
+
+		vet.setId(vetId);
+		this.vetRepository.save(vet);
+		redirectAttributes.addFlashAttribute("message", "Vet Values Updated");
+		return "redirect:/vets/{vetId}";
+	}
+
+	@GetMapping("/vets/{vetId}")
+	public String showVet(@PathVariable("vetId") int vetId, Model model) {
+		Vet vet = this.vetRepository.findById(vetId)
+			.orElseThrow(() -> new IllegalArgumentException("Vet not found with id: " + vetId));
+		model.addAttribute("vet", vet);
+		return "vets/vetDetails";
 	}
 
 }

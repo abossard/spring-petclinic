@@ -24,6 +24,7 @@ import org.springframework.data.repository.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
+import java.util.Optional;
 
 /**
  * Repository class for <code>Vet</code> domain objects All method names are compliant
@@ -55,5 +56,34 @@ public interface VetRepository extends Repository<Vet, Integer> {
 	@Transactional(readOnly = true)
 	@Cacheable("vets")
 	Page<Vet> findAll(Pageable pageable) throws DataAccessException;
+
+	/**
+	 * Retrieve a {@link Vet} from the data store by id.
+	 * <p>
+	 * This method returns an {@link Optional} containing the {@link Vet} if found. If no
+	 * {@link Vet} is found with the provided id, it will return an empty
+	 * {@link Optional}.
+	 * </p>
+	 * @param id the id to search for
+	 * @return an {@link Optional} containing the {@link Vet} if found, or an empty
+	 * {@link Optional} if not found.
+	 */
+	Optional<Vet> findById(Integer id);
+
+	/**
+	 * Save a {@link Vet} to the data store, either inserting or updating it.
+	 * @param vet the {@link Vet} to save
+	 */
+	void save(Vet vet);
+
+	/**
+	 * Retrieve {@link Vet}s from the data store by last name, returning all vets whose
+	 * last name <i>starts</i> with the given name.
+	 * @param lastName Value to search for
+	 * @param pageable Pagination information
+	 * @return a {@link Page} of matching {@link Vet}s (or an empty {@link Page} if none
+	 * found)
+	 */
+	Page<Vet> findByLastNameStartingWith(String lastName, Pageable pageable);
 
 }

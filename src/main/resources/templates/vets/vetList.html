@@ -6,7 +6,7 @@
 <body>
 
 <h2>Veterinarians</h2>
-
+<a href="/vets/new" class="btn btn-primary" style="margin-bottom: 10px;">Add New Vet</a>
 <table id="vets" class="table table-striped">
   <thead>
   <tr>
@@ -19,6 +19,7 @@
       <a th:href="@{'/vets.html?sort=lastName&order=desc'}">Last Name ↓</a>
     </th>
     <th>Specialties</th>
+    <th>Actions</th>
   </tr>
   </thead>
   <tbody>
@@ -28,6 +29,9 @@
     <td>
       <span th:each="specialty : ${vet.specialties}" th:text="${specialty.name + ' '}"></span>
       <span th:if="${vet.nrOfSpecialties == 0}">none</span>
+    </td>
+    <td>
+      <a th:href="@{'/vets/' + ${vet.id} + '/edit'}" class="btn btn-secondary btn-sm">Edit</a>
     </td>
   </tr>
   </tbody>
