@@ -1,165 +1,165 @@
-# Spring PetClinic Sample Application [![Build Status](https://github.com/spring-projects/spring-petclinic/actions/workflows/maven-build.yml/badge.svg)](https://github.com/spring-projects/spring-petclinic/actions/workflows/maven-build.yml)[![Build Status](https://github.com/spring-projects/spring-petclinic/actions/workflows/gradle-build.yml/badge.svg)](https://github.com/spring-projects/spring-petclinic/actions/workflows/gradle-build.yml)
+# GitHub Copilot Hands-On Lab: PetShop Edition 🐾🤖
 
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/spring-projects/spring-petclinic) [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=7517918)
+Welcome to the **GitHub Copilot Hands-On Lab** using the Spring Boot Petclinic application.  
+This workshop is designed to help you learn how to guide GitHub Copilot with clear, specific prompts so it can assist you in writing and modifying code efficiently.
 
-## Understanding the Spring Petclinic application with a few diagrams
+[Original Petclinic README](README.orig.md)
+---
 
-[See the presentation here](https://speakerdeck.com/michaelisvy/spring-petclinic-sample-application)
+## 🚀 General Tips
 
-## Run Petclinic locally
+1. **Be Explicit:** Don’t assume Copilot understands your intent perfectly. Include all relevant information in your prompts.
+2. **Use Copilot Chat:** For anything that goes beyond simple inline autocompletion—like debugging, explaining code, or suggesting new tests—open Copilot Chat and ask for help.
+3. **Show It the Files:** When you want Copilot to reference existing code (e.g., entities, controller classes, or tests), open those files so Copilot can see them and provide more context-aware suggestions.
+4. **Iterate on Prompts:** If you don’t like what Copilot suggests, refine your prompt. The more detail you provide, the better Copilot’s output can be.
 
-Spring Petclinic is a [Spring Boot](https://spring.io/guides/gs/spring-boot) application built using [Maven](https://spring.io/guides/gs/maven/) or [Gradle](https://spring.io/guides/gs/gradle/). You can build a jar file and run it from the command line (it should work just as well with Java 17 or newer):
-
-```bash
-git clone https://github.com/spring-projects/spring-petclinic.git
-cd spring-petclinic
-./mvnw package
-java -jar target/*.jar
-```
-
-(On Windows, or if your shell doesn't expand the glob, you might need to specify the JAR file name explicitly on the command line at the end there.)
-
-You can then access the Petclinic at <http://localhost:8080/>.
-
-<img width="1042" alt="petclinic-screenshot" src="https://cloud.githubusercontent.com/assets/838318/19727082/2aee6d6c-9b8e-11e6-81fe-e889a5ddfded.png">
-
-Or you can run it from Maven directly using the Spring Boot Maven plugin. If you do this, it will pick up changes that you make in the project immediately (changes to Java source files require a compile as well - most people use an IDE for this):
+## How to run the project:
 
 ```bash
-./mvnw spring-boot:run
+./mvnw clean spring-javaformat:apply spring-boot:run
 ```
 
-> NOTE: If you prefer to use Gradle, you can build the app using `./gradlew build` and look for the jar file in `build/libs`.
+(feel free to leave out `clean` to speed up the process, a bit)
+---
 
-## Building a Container
+## 🧭 Chapters Overview
 
-There is no `Dockerfile` in this project. You can build a container image (if you have a docker daemon) using the Spring Boot build plugin:
+1. **🧮 Sorting Tables** – Enable sorting on the list of veterinarians by last name.  
+2. **🩺 Editable Veterinarians** – Create and edit veterinarians using forms and CRUD operations.  
+3. **🌳 Relationship Visualization** – Generate an ASCII tree representing relationships among veterinarians, their specialties, pets, and owners.
 
-```bash
-./mvnw spring-boot:build-image
+---
+
+## 🐣 Chapter 1: Sorting Tables
+
+**Goal:** Add sorting to the list of veterinarians by their last name.
+
+### Files to Modify (probably)
+- `src/main/java/org/springframework/samples/petclinic/vet/VetController.java`  
+  Modify the controller method that retrieves the list of vets to support sorting.
+- `src/main/resources/templates/vets/vetList.html`  
+  Update the Thymeleaf template to include clickable column headers or links that trigger sorting by last name.
+- `src/main/java/org/springframework/samples/petclinic/vet/VetRepository.java`  
+  Add a method like `List<Vet> findAllByOrderByLastNameAsc()` (or similar).
+- `src/test/java/org/springframework/samples/petclinic/vet/VetControllerTests.java`  
+  Write tests that confirm the sorted order is displayed in the view.
+
+### Suggested Copilot Prompts
+
+```java
+// In VetController, add sorting by last name to the list of vets
 ```
 
-## In case you find a bug/suggested improvement for Spring Petclinic
-
-Our issue tracker is available [here](https://github.com/spring-projects/spring-petclinic/issues).
-
-## Database configuration
-
-In its default configuration, Petclinic uses an in-memory database (H2) which
-gets populated at startup with data. The h2 console is exposed at `http://localhost:8080/h2-console`,
-and it is possible to inspect the content of the database using the `jdbc:h2:mem:<uuid>` URL. The UUID is printed at startup to the console.
-
-A similar setup is provided for MySQL and PostgreSQL if a persistent database configuration is needed. Note that whenever the database type changes, the app needs to run with a different profile: `spring.profiles.active=mysql` for MySQL or `spring.profiles.active=postgres` for PostgreSQL. See the [Spring Boot documentation](https://docs.spring.io/spring-boot/how-to/properties-and-configuration.html#howto.properties-and-configuration.set-active-spring-profiles) for more detail on how to set the active profile.
-
-You can start MySQL or PostgreSQL locally with whatever installer works for your OS or use docker:
-
-```bash
-docker run -e MYSQL_USER=petclinic -e MYSQL_PASSWORD=petclinic -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=petclinic -p 3306:3306 mysql:9.1
+```html
+<!-- In vetList.html, create a table header link that passes a sorting parameter -->
 ```
 
-or
+### Testing Hints
+- Ensure the sorting parameter is correctly passed from the UI to the controller.
+- Verify that the repository method returns data sorted by last name.
+- Use existing pagination tests (if any) as a reference to see how sorting might be tested similarly.
 
-```bash
-docker run -e POSTGRES_USER=petclinic -e POSTGRES_PASSWORD=petclinic -e POSTGRES_DB=petclinic -p 5432:5432 postgres:17.0
+__Additional Goal:__
+- Can you make the sorting based on the first name as well?
+- Can you make the sorting based on any table header and ascending/descending?
+
+---
+
+## 🛠️ Chapter 2: Editable Veterinarians
+
+**Goal:** Add the ability to create and edit veterinarians with dedicated form pages.
+
+### Files to Modify
+- `src/main/java/org/springframework/samples/petclinic/vet/VetController.java`
+  - Add new CRUD endpoints (GET/POST for creating, GET/POST for updating).
+- `src/main/java/org/springframework/samples/petclinic/vet/VetRepository.java`
+  - Ensure you have `save(Vet vet)` and `findById(int id)` or equivalent methods.
+- **Create New Template**: `src/main/resources/templates/vets/createOrUpdateVetForm.html`
+  - A Thymeleaf form for capturing veterinarian data (first name, last name, specialties).
+- **Create New File**: `src/main/java/org/springframework/samples/petclinic/vet/VetValidator.java`
+  - Add validation logic for veterinarian data (e.g., mandatory fields, etc.).
+- `src/test/java/org/springframework/samples/petclinic/vet/VetControllerTests.java`
+  - Add tests covering the new CRUD operations (creation, update, error handling).
+
+### Suggested Copilot Prompts
+
+```java
+// In VetController, add a GET endpoint for the create form and a POST endpoint to save a new Vet
+// Validate form inputs, handle errors, and redirect on success
 ```
 
-Further documentation is provided for [MySQL](https://github.com/spring-projects/spring-petclinic/blob/main/src/main/resources/db/mysql/petclinic_db_setup_mysql.txt)
-and [PostgreSQL](https://github.com/spring-projects/spring-petclinic/blob/main/src/main/resources/db/postgres/petclinic_db_setup_postgres.txt).
-
-Instead of vanilla `docker` you can also use the provided `docker-compose.yml` file to start the database containers. Each one has a service named after the Spring profile:
-
-```bash
-docker compose up mysql
+```html
+<!-- createOrUpdateVetForm.html: a Thymeleaf form binding Vet object fields (firstName, lastName, specialties) -->
 ```
 
-or
+### Testing Hints
+- Use `PetControllerTests` or `OwnerControllerTests` as references for testing form submissions.
+- Include tests for:
+  1. Successful creation (correct input).
+  2. Validation errors (invalid or missing fields).
+  3. Editing existing vets (including loading the form with existing data).
+  4. Repository calls (mocking or verifying interactions).
 
-```bash
-docker compose up postgres
+__Additional Goal:__
+- What other forms could you build to make more data editable?
+
+---
+
+## 🌳 Chapter 3: Relationship Visualization
+
+**Goal:** Create a feature that displays an ASCII tree of relationships among veterinarians, their specialties, pets, and owners.
+
+### Files to Modify
+- `src/main/java/org/springframework/samples/petclinic/vet/VetController.java`  
+  - Add a new method to generate or retrieve the data structure needed for the ASCII tree.
+- `src/main/java/org/springframework/samples/petclinic/vet/VetService.java` (or similar service layer)  
+  - Consolidate veterinarian, specialty, pet, and owner data to form a cohesive relationship model.
+- **Create New File**: `src/main/resources/templates/vets/relationshipTree.html`  
+  - Provide a simple UI or page that, when requested, prints out or displays the ASCII tree.
+- `src/test/java/org/springframework/samples/petclinic/vet/VetRelationshipTests.java`  
+  - Write tests verifying the logic that constructs the tree (e.g., each vet node, specialties as children, pets, and owners).
+
+### Implementation Outline
+1. **Data Gathering:** Fetch all Vets, including their specialties, and link each Vet’s associated pets (through existing relationships) to each Pet’s owner.  
+2. **ASCII Tree Construction:** Build a text-based tree structure. For example:
+   ```
+   Dr. Smith (Vet)
+   ├── Specialty: Radiology
+   ├── Specialty: Surgery
+   └── Pets:
+       ├── Buddy (Dog) -> Owner: John Doe
+       └── Princess (Cat) -> Owner: Jane Roe
+   ```
+3. **Presentation:** Display this ASCII output in the `relationshipTree.html` page, or generate it as a text block that can be viewed in the browser or console.
+
+### Suggested Copilot Prompts
+
+```java
+// In VetService, gather vets with their specialties, pets, and owners to build a hierarchical structure
+// Format the data as an ASCII tree for display
 ```
 
-## Test Applications
+```html
+<!-- relationshipTree.html: A page with a <pre> block showing the ASCII relationship tree -->
+```
 
-At development time we recommend you use the test applications set up as `main()` methods in `PetClinicIntegrationTests` (using the default H2 database and also adding Spring Boot Devtools), `MySqlTestApplication` and `PostgresIntegrationTests`. These are set up so that you can run the apps in your IDE to get fast feedback and also run the same classes as integration tests against the respective database. The MySql integration tests use Testcontainers to start the database in a Docker container, and the Postgres tests use Docker Compose to do the same thing.
+### Testing Hints
+- Test that all vets appear in the tree.
+- Test that each specialty is linked to the correct vet.
+- Test that pets (with owners) appear under the correct vet node.
+- Consider edge cases (e.g., a vet with no specialties, a pet with no owner in the data set).
 
-## Compiling the CSS
 
-There is a `petclinic.css` in `src/main/resources/static/resources/css`. It was generated from the `petclinic.scss` source, combined with the [Bootstrap](https://getbootstrap.com/) library. If you make changes to the `scss`, or upgrade Bootstrap, you will need to re-compile the CSS resources using the Maven profile "css", i.e. `./mvnw package -P css`. There is no build profile for Gradle to compile the CSS.
+__Additional Goal:__
+- Can you add links to the ASCII tree that allow you to click on a vet or pet to view their details?
 
-## Working with Petclinic in your IDE
+---
 
-### Prerequisites
+## 🎓 What You’ve Learned
 
-The following items should be installed in your system:
+- **Prompt Engineering:** You’ve seen how Copilot’s suggestions improve with detailed instructions and the right context.
+- **Incremental Development:** Each chapter builds on the previous one, illustrating how to structure your feature work.
+- **Testing & Validation:** Thorough tests are crucial to ensure new features and refactoring don’t break existing functionality.
+- **Copilot Chat:** It can explain code, offer refactoring strategies, and assist with debugging—just ask!
 
-- Java 17 or newer (full JDK, not a JRE)
-- [Git command line tool](https://help.github.com/articles/set-up-git)
-- Your preferred IDE
-  - Eclipse with the m2e plugin. Note: when m2e is available, there is an m2 icon in `Help -> About` dialog. If m2e is
-  not there, follow the install process [here](https://www.eclipse.org/m2e/)
-  - [Spring Tools Suite](https://spring.io/tools) (STS)
-  - [IntelliJ IDEA](https://www.jetbrains.com/idea/)
-  - [VS Code](https://code.visualstudio.com)
-
-### Steps
-
-1. On the command line run:
-
-    ```bash
-    git clone https://github.com/spring-projects/spring-petclinic.git
-    ```
-
-1. Inside Eclipse or STS:
-
-    Open the project via `File -> Import -> Maven -> Existing Maven project`, then select the root directory of the cloned repo.
-
-    Then either build on the command line `./mvnw generate-resources` or use the Eclipse launcher (right-click on project and `Run As -> Maven install`) to generate the CSS. Run the application's main method by right-clicking on it and choosing `Run As -> Java Application`.
-
-1. Inside IntelliJ IDEA:
-
-    In the main menu, choose `File -> Open` and select the Petclinic [pom.xml](pom.xml). Click on the `Open` button.
-
-    - CSS files are generated from the Maven build. You can build them on the command line `./mvnw generate-resources` or right-click on the `spring-petclinic` project then `Maven -> Generates sources and Update Folders`.
-
-    - A run configuration named `PetClinicApplication` should have been created for you if you're using a recent Ultimate version. Otherwise, run the application by right-clicking on the `PetClinicApplication` main class and choosing `Run 'PetClinicApplication'`.
-
-1. Navigate to the Petclinic
-
-    Visit [http://localhost:8080](http://localhost:8080) in your browser.
-
-## Looking for something in particular?
-
-|Spring Boot Configuration | Class or Java property files  |
-|--------------------------|---|
-|The Main Class | [PetClinicApplication](https://github.com/spring-projects/spring-petclinic/blob/main/src/main/java/org/springframework/samples/petclinic/PetClinicApplication.java) |
-|Properties Files | [application.properties](https://github.com/spring-projects/spring-petclinic/blob/main/src/main/resources) |
-|Caching | [CacheConfiguration](https://github.com/spring-projects/spring-petclinic/blob/main/src/main/java/org/springframework/samples/petclinic/system/CacheConfiguration.java) |
-
-## Interesting Spring Petclinic branches and forks
-
-The Spring Petclinic "main" branch in the [spring-projects](https://github.com/spring-projects/spring-petclinic)
-GitHub org is the "canonical" implementation based on Spring Boot and Thymeleaf. There are
-[quite a few forks](https://spring-petclinic.github.io/docs/forks.html) in the GitHub org
-[spring-petclinic](https://github.com/spring-petclinic). If you are interested in using a different technology stack to implement the Pet Clinic, please join the community there.
-
-## Interaction with other open-source projects
-
-One of the best parts about working on the Spring Petclinic application is that we have the opportunity to work in direct contact with many Open Source projects. We found bugs/suggested improvements on various topics such as Spring, Spring Data, Bean Validation and even Eclipse! In many cases, they've been fixed/implemented in just a few days.
-Here is a list of them:
-
-| Name | Issue |
-|------|-------|
-| Spring JDBC: simplify usage of NamedParameterJdbcTemplate | [SPR-10256](https://github.com/spring-projects/spring-framework/issues/14889) and [SPR-10257](https://github.com/spring-projects/spring-framework/issues/14890) |
-| Bean Validation / Hibernate Validator: simplify Maven dependencies and backward compatibility |[HV-790](https://hibernate.atlassian.net/browse/HV-790) and [HV-792](https://hibernate.atlassian.net/browse/HV-792) |
-| Spring Data: provide more flexibility when working with JPQL queries | [DATAJPA-292](https://github.com/spring-projects/spring-data-jpa/issues/704) |
-
-## Contributing
-
-The [issue tracker](https://github.com/spring-projects/spring-petclinic/issues) is the preferred channel for bug reports, feature requests and submitting pull requests.
-
-For pull requests, editor preferences are available in the [editor config](.editorconfig) for easy use in common text editors. Read more and download plugins at <https://editorconfig.org>. All commits must include a __Signed-off-by__ trailer at the end of each commit message to indicate that the contributor agrees to the Developer Certificate of Origin.
-For additional details, please refer to the blog post [Hello DCO, Goodbye CLA: Simplifying Contributions to Spring](https://spring.io/blog/2025/01/06/hello-dco-goodbye-cla-simplifying-contributions-to-spring).
-
-## License
-
-The Spring PetClinic sample application is released under version 2.0 of the [Apache License](https://www.apache.org/licenses/LICENSE-2.0).
+With these chapters complete, you’ll have a fully functional (and more understandable) Petclinic application featuring sorting, editable veterinarians, clean refactored code, and a helpful ASCII tree to visualize relationships. Happy coding!
