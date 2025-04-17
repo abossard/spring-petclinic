@@ -7,6 +7,22 @@
 
 <h2>Veterinarians</h2>
 
+<div>
+  <span th:if="${currentSort == 'asc'}">
+    <strong>Sort by Last Name (Ascending)</strong>
+  </span>
+  <span th:if="${currentSort != 'asc'}">
+    <a th:href="@{'/vets.html?page=1&sort=asc'}">Sort by Last Name (Ascending)</a>
+  </span>
+  |
+  <span th:if="${currentSort == 'desc'}">
+    <strong>Sort by Last Name (Descending)</strong>
+  </span>
+  <span th:if="${currentSort != 'desc'}">
+    <a th:href="@{'/vets.html?page=1&sort=desc'}">Sort by Last Name (Descending)</a>
+  </span>
+</div>
+
 <table id="vets" class="table table-striped">
   <thead>
   <tr>

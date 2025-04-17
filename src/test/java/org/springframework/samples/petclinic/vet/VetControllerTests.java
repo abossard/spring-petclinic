@@ -73,10 +73,13 @@ class VetControllerTests {
 
 	@BeforeEach
 	void setup() {
-		given(this.vets.findAll()).willReturn(Lists.newArrayList(james(), helen()));
-		given(this.vets.findAll(any(Pageable.class)))
-			.willReturn(new PageImpl<Vet>(Lists.newArrayList(james(), helen())));
-
+		given(this.vets.findAll(any(Pageable.class))).willAnswer(invocation -> {
+			Pageable pageable = invocation.getArgument(0);
+			if (pageable.getSort().getOrderFor("lastName").isDescending()) {
+				return new PageImpl<Vet>(Lists.newArrayList(helen(), james()));
+			}
+			return new PageImpl<Vet>(Lists.newArrayList(james(), helen()));
+		});
 	}
 
 	@Test
@@ -95,6 +98,26 @@ class VetControllerTests {
 			.andExpect(status().isOk());
 		actions.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.vetList[0].id").value(1));
+	}
+
+	@Test
+	void testShowVetListHtmlSortedAsc() throws Exception {
+		mockMvc.perform(MockMvcRequestBuilders.get("/vets.html?page=1&sort=asc"))
+			.andExpect(status().isOk())
+			.andExpect(model().attributeExists("listVets"))
+			.andExpect(view().name("vets/vetList"))
+			.andExpect(model().attribute("listVets[0].lastName", "Carter"))
+			.andExpect(model().attribute("listVets[1].lastName", "Leary"));
+	}
+
+	@Test
+	void testShowVetListHtmlSortedDesc() throws Exception {
+		mockMvc.perform(MockMvcRequestBuilders.get("/vets.html?page=1&sort=desc"))
+			.andExpect(status().isOk())
+			.andExpect(model().attributeExists("listVets"))
+			.andExpect(view().name("vets/vetList"))
+			.andExpect(model().attribute("listVets[0].lastName", "Leary"))
+			.andExpect(model().attribute("listVets[1].lastName", "Carter"));
 	}
 
 }
