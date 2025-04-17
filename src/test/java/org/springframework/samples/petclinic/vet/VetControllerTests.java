@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledInNativeImage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -31,8 +32,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.Optional;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -40,7 +44,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Test class for the {@link VetController}
  */
 
-@WebMvcTest(VetController.class)
+@WebMvcTest(controllers = VetController.class)
 @DisabledInNativeImage
 @DisabledInAotMode
 class VetControllerTests {
@@ -50,6 +54,9 @@ class VetControllerTests {
 
 	@MockitoBean
 	private VetRepository vets;
+
+	@MockitoBean
+	private VetRepository vetRepository;
 
 	private Vet james() {
 		Vet james = new Vet();
@@ -71,15 +78,25 @@ class VetControllerTests {
 		return helen;
 	}
 
+	private Vet testVet;
+
 	@BeforeEach
 	void setup() {
-		given(this.vets.findAll(any(Pageable.class))).willAnswer(invocation -> {
+		given(this.vetRepository.findAll(any(Pageable.class))).willAnswer(invocation -> {
 			Pageable pageable = invocation.getArgument(0);
 			if (pageable.getSort().getOrderFor("lastName").isDescending()) {
 				return new PageImpl<Vet>(Lists.newArrayList(helen(), james()));
 			}
 			return new PageImpl<Vet>(Lists.newArrayList(james(), helen()));
 		});
+
+		testVet = new Vet();
+		testVet.setId(1);
+		testVet.setFirstName("John");
+		testVet.setLastName("Doe");
+
+		when(vetRepository.findById(1)).thenReturn(Optional.of(testVet));
+		when(vetRepository.save(any(Vet.class))).thenReturn(testVet);
 	}
 
 	@Test
@@ -118,6 +135,44 @@ class VetControllerTests {
 			.andExpect(view().name("vets/vetList"))
 			.andExpect(model().attribute("listVets[0].lastName", "Leary"))
 			.andExpect(model().attribute("listVets[1].lastName", "Carter"));
+	}
+
+	@Test
+	void testInitCreationForm() throws Exception {
+		mockMvc.perform(MockMvcRequestBuilders.get("/vets/new"))
+			.andExpect(status().isOk())
+			.andExpect(view().name("vets/createOrUpdateVetForm"))
+			.andExpect(model().attributeExists("vet"));
+	}
+
+	@Test
+	void testProcessCreationForm() throws Exception {
+		mockMvc
+			.perform(MockMvcRequestBuilders.post("/vets/new")
+				.contentType(MediaType.APPLICATION_FORM_URLENCODED)
+				.param("firstName", "John")
+				.param("lastName", "Doe"))
+			.andExpect(status().is3xxRedirection())
+			.andExpect(view().name("redirect:/vets.html"));
+	}
+
+	@Test
+	void testInitUpdateForm() throws Exception {
+		mockMvc.perform(MockMvcRequestBuilders.get("/vets/1/edit"))
+			.andExpect(status().isOk())
+			.andExpect(view().name("vets/createOrUpdateVetForm"))
+			.andExpect(model().attributeExists("vet"));
+	}
+
+	@Test
+	void testProcessUpdateForm() throws Exception {
+		mockMvc
+			.perform(MockMvcRequestBuilders.post("/vets/1/edit")
+				.contentType(MediaType.APPLICATION_FORM_URLENCODED)
+				.param("firstName", "John")
+				.param("lastName", "Doe"))
+			.andExpect(status().is3xxRedirection())
+			.andExpect(view().name("redirect:/vets.html"));
 	}
 
 }

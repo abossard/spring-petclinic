@@ -23,9 +23,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import jakarta.validation.Valid;
 
 /**
  * @author Juergen Hoeller
@@ -77,6 +82,45 @@ class VetController {
 		Vets vets = new Vets();
 		vets.getVetList().addAll(this.vetRepository.findAll());
 		return vets;
+	}
+
+	@GetMapping("/vets/new")
+	public String initCreationForm(Model model) {
+		model.addAttribute("vet", new Vet());
+		return "vets/createOrUpdateVetForm";
+	}
+
+	@PostMapping("/vets/new")
+	public String processCreationForm(@Valid Vet vet, BindingResult result) {
+		if (result.hasErrors()) {
+			return "vets/createOrUpdateVetForm";
+		}
+		vetRepository.save(vet);
+		return "redirect:/vets.html";
+	}
+
+	@GetMapping("/vets/{vetId}/edit")
+	public String initUpdateForm(@PathVariable("vetId") int vetId, Model model) {
+		Vet vet = vetRepository.findById(vetId)
+			.orElseThrow(() -> new IllegalArgumentException("Invalid vet Id:" + vetId));
+		model.addAttribute("vet", vet);
+		return "vets/createOrUpdateVetForm";
+	}
+
+	@PostMapping("/vets/{vetId}/edit")
+	public String processUpdateForm(@Valid Vet vet, BindingResult result, @PathVariable("vetId") int vetId) {
+		if (result.hasErrors()) {
+			return "vets/createOrUpdateVetForm";
+		}
+		vet.setId(vetId);
+		vetRepository.save(vet);
+		return "redirect:/vets.html";
+	}
+
+	@GetMapping("/vets/{vetId}/delete")
+	public String deleteVet(@PathVariable("vetId") int vetId) {
+		vetRepository.deleteById(vetId);
+		return "redirect:/vets.html";
 	}
 
 }
