@@ -15,6 +15,7 @@
  */
 package org.springframework.samples.petclinic.vet;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -117,10 +118,38 @@ class VetController {
 		return "redirect:/vets.html";
 	}
 
+
 	@GetMapping("/vets/{vetId}/delete")
 	public String deleteVet(@PathVariable("vetId") int vetId) {
 		vetRepository.deleteById(vetId);
 		return "redirect:/vets.html";
+	}
+
+	@GetMapping("/vets/relationshipTree")
+	public String showRelationshipTree(Model model) {
+		Collection<Vet> vets = vetRepository.findAll();
+		StringBuilder treeBuilder = new StringBuilder();
+
+		// for (Vet vet : vets) {
+		// treeBuilder.append(vet.getFirstName()).append("
+		// ").append(vet.getLastName()).append(" (Vet)\n");
+		// for (Specialty specialty : vet.getSpecialties()) {
+		// treeBuilder.append("├── Specialty: ").append(specialty.getName()).append("\n");
+		// }
+		// treeBuilder.append("└── Owners and Pets:\n");
+		// for (Owner owner : vet.getOwners()) { // Assuming a method to fetch owners
+		// associated with a vet
+		// treeBuilder.append(" ├── ").append(owner.getFirstName()).append("
+		// ").append(owner.getLastName()).append(" (Owner)\n");
+		// for (Pet pet : owner.getPets()) {
+		// treeBuilder.append(" ├── ").append(pet.getName()).append("
+		// (").append(pet.getType().getName()).append(")\n");
+		// }
+		// }
+		// }
+
+		model.addAttribute("relationshipTree", treeBuilder.toString());
+		return "vets/relationshipTree";
 	}
 
 }

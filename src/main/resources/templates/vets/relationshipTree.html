@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout (~{::body},'vets')}">
+
+<body>
+<h2>Veterinarian Relationship Tree</h2>
+<pre th:text="${relationshipTree}"></pre>
+<a th:href="@{'/vets.html'}" class="btn btn-primary">Back to Vet List</a>
+</body>
+</html>
